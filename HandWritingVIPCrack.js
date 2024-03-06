@@ -16,6 +16,7 @@
 # > 手写模拟器
 ^https?:\/\/ename\.miplus\.cloud\/config\/info url script-response-body https://raw.githubusercontent.com/577fkj/QuantumultX/main/HandWritingVIPCrack.js
 ^https?:\/\/ename\.miplus\.cloud\/user\/payInfo url script-response-body https://raw.githubusercontent.com/577fkj/QuantumultX/main/HandWritingVIPCrack.js
+^https?:\/\/ename\.miplus\.cloud\/user\/login url script-response-body https://raw.githubusercontent.com/577fkj/QuantumultX/main/HandWritingVIPCrack.js
 
 [mitm] 
 
@@ -64,6 +65,7 @@ function Encrypt(data, key, iv) {
 
 function changeUserData(ciphertext) {
   var data = Decrypt(ciphertext, key, iv);
+  console.log("user_data: " + data);
   var user_data = JSON.parse(data);
   user_data.vip = true;
   user_data.expiredTime = 4036579200;
@@ -82,7 +84,10 @@ function changeGuestData(ciphertext) {
   return Encrypt(JSON.stringify(guest_data), key, iv);
 }
 
+console.log("HandWritingVIPCrack: 开始破解VIP");
+
 var body = $response.body;
+console.log("body: " + body);
 var json = JSON.parse(body);
 if (json.code != 1) {
   console.log("HandWritingVIPCrack: 无法获取VIP信息");
@@ -93,6 +98,10 @@ json.data.splashShow = false;
 
 if (json.data.userResult && json.data.userResult.userMsg) {
   json.data.userResult.userMsg = changeUserData(json.data.userResult.userMsg);
+}
+
+if (json.data.userMsg) {
+  data.userMsg = changeUserData(data.userMsg);
 }
 
 json.data.guestResult = changeGuestData(json.data.guestResult);
