@@ -14,7 +14,8 @@
 [rewrite_local]
 
 # > 手写模拟器
-^https?:\/\/ename\.miplus\.cloud\/config\/info url script-response-body https://raw.githubusercontent.com/577fkj/QuantumultX/master/HandWritingVIPCrack.js
+^https?:\/\/ename\.miplus\.cloud\/config\/info url script-response-body https://raw.githubusercontent.com/577fkj/QuantumultX/main/HandWritingVIPCrack.js
+^https?:\/\/ename\.miplus\.cloud\/user\/payInfo url script-response-body https://raw.githubusercontent.com/577fkj/QuantumultX/main/HandWritingVIPCrack.js
 
 [mitm] 
 
@@ -35,45 +36,58 @@ CryptoJS = initCryptoJS();
 key = "koPefhaDiuLamyzt";
 iv = "IwlIDraMludweDpH";
 
-function changeUserData(ciphertext) {
-  var item = CryptoJS.AES.decrypt(key, ciphertext, {
+function Decrypt(data, key, iv) {
+  key = CryptoJS.enc.Utf8.parse(key);
+  iv = CryptoJS.enc.Utf8.parse(iv);
+  const base64 = CryptoJS.enc.Base64.parse(data);
+  const base64Str = CryptoJS.enc.Base64.stringify(base64);
+  const decrypt = CryptoJS.AES.decrypt(base64Str, key, {
+    iv: iv,
     mode: CryptoJS.mode.CBC,
     padding: CryptoJS.pad.Pkcs7,
+  });
+  let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
+  return decryptedStr.toString();
+}
+
+function Encrypt(data, key, iv) {
+  key = CryptoJS.enc.Utf8.parse(key);
+  iv = CryptoJS.enc.Utf8.parse(iv);
+  data = CryptoJS.enc.Utf8.parse(data);
+  let encrypted = CryptoJS.AES.encrypt(data, key, {
     iv: iv,
-  }).toString(CryptoJS.enc.Utf8);
-  var user_data = JSON.parse(item);
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+  return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
+}
+
+function changeUserData(ciphertext) {
+  var data = Decrypt(ciphertext, key, iv);
+  var user_data = JSON.parse(data);
   user_data.vip = true;
   user_data.expiredTime = 4036579200;
-  return CryptoJS.AES.encrypt(JSON.stringify(user_data), key, {
-    mode: CryptoJS.mode.CBC,
-    padding: CryptoJS.pad.Pkcs7,
-    iv: iv,
-  }).toString(CryptoJS.enc.Utf8);
+  return Encrypt(JSON.stringify(user_data), key, iv);
 }
 
 function changeGuestData(ciphertext) {
   var guest;
   if (ciphertext) {
-    guest = CryptoJS.AES.decrypt(key, ciphertext, {
-      mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.Pkcs7,
-      iv: iv,
-    }).toString(CryptoJS.enc.Utf8);
+    guest = Decrypt(ciphertext, key, iv);
   } else {
     guest = "{}";
   }
   var guest_data = JSON.parse(guest);
   guest_data.vip = true;
-  return CryptoJS.AES.encrypt(JSON.stringify(guest_data), key, {
-    mode: CryptoJS.mode.CBC,
-    padding: CryptoJS.pad.Pkcs7,
-    iv: iv,
-  }).toString(CryptoJS.enc.Utf8);
+  return Encrypt(JSON.stringify(guest_data), key, iv);
 }
 
 var body = $response.body;
 var json = JSON.parse(body);
-if (json.code != 1) return;
+if (json.code != 1) {
+  console.log("HandWritingVIPCrack: 无法获取VIP信息");
+  return;
+}
 
 json.data.splashShow = false;
 
@@ -85,6 +99,7 @@ json.data.guestResult = changeGuestData(json.data.guestResult);
 
 body = JSON.stringify(json);
 
+console.log("HandWritingVIPCrack: VIP破解成功");
 $done({
   body,
 });
