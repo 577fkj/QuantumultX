@@ -101,7 +101,7 @@ if (json.data.userResult && json.data.userResult.userMsg) {
 }
 
 if (json.data.userMsg) {
-  data.userMsg = changeUserData(data.userMsg);
+  json.data.userMsg = changeUserData(json.data.userMsg);
 }
 
 json.data.guestResult = changeGuestData(json.data.guestResult);
