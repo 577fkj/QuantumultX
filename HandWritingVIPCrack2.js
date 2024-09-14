@@ -14,7 +14,7 @@
 [rewrite_local]
 
 # > 手写模拟器
-^https?:\/\/ename\.miplus\.cloud\/(user|config)\/(login|payInfo|info) url script-response-body https://raw.githubusercontent.com/577fkj/QuantumultX/main/HandWritingVIPCrack.js
+^https?:\/\/ename\.miplus\.cloud\/(user|config)\/(login|payInfo|info) url script-response-body https://raw.githubusercontent.com/577fkj/QuantumultX/main/HandWritingVIPCrack2.js
 
 [mitm] 
 
